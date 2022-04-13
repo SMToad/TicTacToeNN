@@ -8,8 +8,7 @@ namespace TicTacToeWPF.GameElements
 {
     public class PlayBoard
     {
-        private int[,] board;
-        public int[,] Board { get => board.Clone() as int[,]; private set => board = value; }
+        public int[,] Board { get; private set; }
    
         public int Size { get; set; }
         public PlayBoard(int size = 3)
@@ -46,15 +45,9 @@ namespace TicTacToeWPF.GameElements
         
         public List<int> BlockedMoves() => GetMoves(false).Flatten(Size);
         
-        public void MakeMove((int X, int Y) move, int value, Grid gridPlayBoard = null)
+        public void MakeMove((int X, int Y) move, int value)
         {
             Board[move.X, move.Y] = value;
-            if (gridPlayBoard == null ) return;
-            foreach (Button btn in gridPlayBoard.Children)
-            {
-                if (Grid.GetRow(btn) == move.X && Grid.GetColumn(btn) == move.Y)
-                    btn.Content = Board[move.X, move.Y] == 1 ? "X" : "O";
-            }
         }
     }
 }

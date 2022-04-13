@@ -33,6 +33,11 @@ namespace TicTacToeWPF.Players
         {
             if (currentTurn == PlayerTurn.O) playBoard.Invert();
             (int X, int Y) move = QLearning.PredictMove(playBoard);
+            Training.MemoryBuffer.Add(new MemoryEntry()
+            {
+                Move = move,
+                State = playBoard.Board
+            });
             if (currentTurn == PlayerTurn.O) playBoard.Invert();
             return move;
         }
@@ -44,7 +49,7 @@ namespace TicTacToeWPF.Players
 
             for (int i = 0; i < trainBuffer.Size - 1; i++)
             {
-                double[] currState = trainBuffer.History[i].Board.FlattenDouble();
+                double[] currState = trainBuffer.History[i].State.FlattenDouble();
                 Training.Train(currState, QLearning.GetTargetQValues(trainBuffer.History[i], rewardValue));
             }
            QLearning.DecreaseEpsilon();

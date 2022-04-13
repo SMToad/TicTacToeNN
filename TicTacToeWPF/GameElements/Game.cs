@@ -8,12 +8,14 @@ namespace TicTacToeWPF
 {
     public static class Game
     {
-        public static float GetGameScore(GameState gameState)
+        public static float GetGameScore(PlayerTurn playerTurn, GameState gameState)
         {
             switch (gameState)
             {
-                case GameState.XWin: return 1;
-                case GameState.OWin: return -1;
+                case GameState.XWin: 
+                    return playerTurn == PlayerTurn.X? 1 : -1;
+                case GameState.OWin:
+                    return playerTurn == PlayerTurn.O ? 1 : -1;
                 default: return 0;
             }
         }
@@ -67,7 +69,7 @@ namespace TicTacToeWPF
             }
             return nextPlayer;
         }
-        public static GameState Play(PlayBoard playBoard, ref Grid gridPlayBoard, (Player X, Player O) players)
+        public static GameState Play(PlayBoard playBoard, (Player X, Player O) players)
         {
             players.X.NewGame();
             players.O.NewGame();
@@ -77,13 +79,13 @@ namespace TicTacToeWPF
             do
             {
                 (int X, int Y) move = currentPlayer.Move(playBoard, currentTurn);
-                playBoard.MakeMove(move, (int)currentTurn, gridPlayBoard);
+                playBoard.MakeMove(move, (int)currentTurn);
                 gameState = GetGameState(playBoard, move);
                 currentPlayer = SwitchTurn(players, ref currentTurn);
             } while (gameState == GameState.InGame);
             
-           players.X.Reward(GetGameScore(gameState));
-           players.O.Reward(-1);
+           players.X.Reward(GetGameScore(PlayerTurn.X, gameState));
+           players.O.Reward(GetGameScore(PlayerTurn.O, gameState));
            return gameState;
         }
     }

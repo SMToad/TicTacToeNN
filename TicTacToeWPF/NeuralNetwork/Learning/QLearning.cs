@@ -71,8 +71,8 @@ namespace TicTacToeWPF.Learning
         }
         public double[] GetTargetQValues(MemoryEntry memoryEntry, float rewardValue)
         {
-            int size = memoryEntry.Board.GetLength(0);
-            double[] currState = memoryEntry.Board.FlattenDouble();
+            int size = memoryEntry.State.GetLength(0);
+            double[] currState = memoryEntry.State.FlattenDouble();
             double[] targetQValues = Network.Compute(currState).Clone() as double[];
             if (memoryEntry.NextState != null)
             {

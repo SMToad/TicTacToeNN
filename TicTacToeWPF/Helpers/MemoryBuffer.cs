@@ -27,7 +27,7 @@ namespace TicTacToeWPF
             else Size++;
             History.Add(memoryEntry);
             if (Size > 1)
-                History[Size - 2].NextState = memoryEntry.Board;
+                History[Size - 2].NextState = memoryEntry.State;
         }
         public void Add(MemoryBuffer buffer)
         {
