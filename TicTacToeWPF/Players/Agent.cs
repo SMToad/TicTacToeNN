@@ -50,7 +50,7 @@ namespace TicTacToeWPF.Players
             for (int i = 0; i < trainBuffer.Size - 1; i++)
             {
                 double[] currState = trainBuffer.History[i].State.FlattenDouble();
-                Training.Train(currState, QLearning.GetTargetQValues(trainBuffer.History[i], rewardValue));
+                Training.Train(currState, QLearning.GetTargetQValues(trainBuffer.History[i]));
             }
            QLearning.DecreaseEpsilon();
 

@@ -7,139 +7,142 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
         Title="TicTacToe" Width="700" Height="450">
-    <Grid Name="gridMain" 
+    <Border 
+            BorderBrush="Gainsboro" 
+            BorderThickness="10">
+        <Grid Name="gridMain" 
           Background="Gainsboro">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="2*"/>
-            <RowDefinition Height="9*"/>
-            <RowDefinition Height="2*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="6*"/>
-            <ColumnDefinition Width="5*"/>
-        </Grid.ColumnDefinitions>
-        <StackPanel Grid.RowSpan="2"
-                    Grid.ColumnSpan="2" 
-                    Margin="0,0,46.4,290.2">
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Размер игры:"/>
-                <TextBox Name="tbPlayBoardSize" 
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="9*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="6*"/>
+                <ColumnDefinition Width="5*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0"
+                    Grid.Column="0">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Размер игры:"/>
+                    <TextBox Name="tbPlayBoardSize" 
                          Width="20" 
                          Height="20"
                          Text="3" 
                          FontSize="12" 
                          TextAlignment="Center" 
-                         Background="Snow" />
-                <Label Content="Соперник:"/>
-                <ComboBox Name="cbOpponent"
+                         Background="Snow"/>
+                    <Label Content="Соперник:"/>
+                    <ComboBox Name="cbOpponent"
                           Height="23" 
                           FontSize="10" 
                           SelectedIndex="0"
                           SelectionChanged="cbOpponent_SelectionChanged" >
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <Label Content="{Binding}" 
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <Label Content="{Binding}" 
                                    Height="23"
                                    FontSize="10"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <Label Content="Кол-во игр:"/>
-                <TextBox Name="tbTotalRounds" 
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Label Content="Кол-во игр:"/>
+                    <TextBox Name="tbTotalRounds" 
                          Width="auto" 
                          Height="20"
                          Text="2500" 
                          FontSize="12" 
                          TextAlignment="Center" 
                          Background="Snow"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button Name="btnStart" 
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Name="btnStart" 
                         Height="30" 
                         Grid.Row="0" 
                         HorizontalAlignment="Left" 
                         Content="Начать" 
                         Background="Lavender"
                         Click="btnStart_Clicked" />
-                <Button Name="btnStop" 
+                    <Button Name="btnStop" 
                         Height="30" 
                         Grid.Row="0" 
                         HorizontalAlignment="Center" 
                         Content="Остановить" 
                         Background="Lavender" 
                         Click="btnStop_Clicked" />
-                <Button Name="btnResetNet" 
+                    <Button Name="btnResetNet" 
                         Height="30" 
                         Grid.Row="0" 
                         HorizontalAlignment="Right" 
                         Content="Обнулить" 
                         Background="Lavender" 
                         Click="btnResetNet_Clicked" />
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
-        <Label Name="lbStatusBar" 
+            <Grid Name="gridPlayBoard" 
+              Grid.Row="1" 
+              Grid.Column="0"/>
+            <Label Name="lbStatusBar" 
                Grid.Row="2" 
                HorizontalAlignment="Center"
                VerticalAlignment="Center" 
                Content="Задайте параметры игры/тренировки" 
                FontSize="18"  
                Background="Transparent"/>
-        <Grid Name="gridPlayBoard" 
-              Grid.Row="1" 
-              Grid.Column="0"/>
-        <Grid Grid.Column="1" 
+            <Grid Grid.Column="1" 
               Grid.RowSpan="3" 
               Grid.ColumnSpan="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="4*"/>
-                <RowDefinition Height="4*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Name="tbRoundsCount" 
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="4*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Name="tbRoundsCount" 
                        Grid.Row="0" 
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Text="Раунд"  
                        FontSize="18"  />
-            <oxy:Plot Name="pltResultGraph" 
+                <oxy:Plot Name="pltResultGraph" 
                       Grid.Row="1" 
                       Background="Transparent">
-                <oxy:LineSeries Name="lsNetWinsData" 
+                    <oxy:LineSeries Name="lsNetWinsData" 
                                 ItemsSource="{Binding NetWinsData}"/>
-                <oxy:LineSeries Name="lsTiesData" 
+                    <oxy:LineSeries Name="lsTiesData" 
                                 ItemsSource="{Binding TiesData}"/>
-                <oxy:LineSeries Name="lsNetLossesData" 
+                    <oxy:LineSeries Name="lsNetLossesData" 
                                 ItemsSource="{Binding NetLossesData}"/>
-            </oxy:Plot>
+                </oxy:Plot>
 
-            <ListView Name="lvResultTable" 
+                <ListView Name="lvResultTable" 
                       Grid.Row="2"  
                       FontSize="13" 
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      Background="Transparent" >
-                <ListView.View>
-                    <GridView >
-                        <GridView.ColumnHeaderContainerStyle>
-                            <Style TargetType="{x:Type GridViewColumnHeader}">
-                                <Setter Property="Background" 
+                      Background="Transparent" 
+                      HorizontalAlignment="Center">
+                    <ListView.View>
+                        <GridView >
+                            <GridView.ColumnHeaderContainerStyle>
+                                <Style TargetType="{x:Type GridViewColumnHeader}">
+                                    <Setter Property="Background" 
                                         Value="Transparent"/>
-                            </Style>
-                        </GridView.ColumnHeaderContainerStyle>
-                        <GridViewColumn   Header="Обуч. партии" 
-                                          Width="85" 
-                                          DisplayMemberBinding="{Binding RoundsCount}"/>
-                        <GridViewColumn   Header="Сеть" 
+                                </Style>
+                            </GridView.ColumnHeaderContainerStyle>
+                            <GridViewColumn   Header="Сеть" 
                                           Width="70" 
                                           DisplayMemberBinding="{Binding WinsCount}"/>
-                        <GridViewColumn Header="Соперник" 
+                            <GridViewColumn Header="Соперник" 
                                         Width="70" 
                                         DisplayMemberBinding="{Binding LossesCount}"/>
-                        <GridViewColumn Header="Ничья" 
-                                        Width="60" 
+                            <GridViewColumn Header="Ничья" 
+                                        Width="70" 
                                         DisplayMemberBinding="{Binding TiesCount}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
+
         </Grid>
-    </Grid>
+    </Border>
 </Window>

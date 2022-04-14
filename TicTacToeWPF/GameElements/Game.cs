@@ -13,10 +13,12 @@ namespace TicTacToeWPF
             switch (gameState)
             {
                 case GameState.XWin: 
-                    return playerTurn == PlayerTurn.X? 1 : -1;
+                    return playerTurn == PlayerTurn.X? 1f : -1f;
                 case GameState.OWin:
-                    return playerTurn == PlayerTurn.O ? 1 : -1;
-                default: return 0;
+                    return playerTurn == PlayerTurn.O ? 1f : -1f;
+                case GameState.Tie: 
+                    return 0.5f;
+                default: return 0f;
             }
         }
         public static GameState GetGameState(PlayBoard playBoard, (int X, int Y) lastMove)

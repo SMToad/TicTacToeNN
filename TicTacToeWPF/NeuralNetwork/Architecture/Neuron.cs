@@ -10,7 +10,7 @@ namespace TicTacToeWPF.Architecture
         public double Output { get; protected set; } = 0;
         public double Bias { get; set; } = 0.01;
         public ActivationFunction ActivationFunction { get; set; } = null;
-        protected static Random rand = new Random();
+        protected static Random _rand = new Random();
         public static float[] RandRange{get; set;} = { 0.0f, 1.0f };
         public Neuron(int inputs, ActivationFunction function)
         {
@@ -23,8 +23,8 @@ namespace TicTacToeWPF.Architecture
         {
             double d = RandRange.Length;
             for (int i = 0; i < InputsCount; i++)
-                Weights[i] = rand.NextDouble() * d + RandRange[0];
-            Bias = rand.NextDouble() * (RandRange.Length) + RandRange[0];
+                Weights[i] = _rand.NextDouble() * d + RandRange[0];
+            Bias = _rand.NextDouble() * (RandRange.Length) + RandRange[0];
         }
         public double Compute(double[] input)
         {

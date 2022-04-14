@@ -6,57 +6,57 @@ namespace TicTacToeWPF.Learning
 {
     public class BackPropagation
     {
-        private Network network;
-        private double learningRate = 0.025;
+        private Network _network;
+        private double _learningRate = 0.025;
         public double LearningRate
         {
-            get { return learningRate; }
+            get { return _learningRate; }
             set
             {
-                learningRate = Math.Max(0.0, Math.Min(1.0, value));
+                _learningRate = Math.Max(0.0, Math.Min(1.0, value));
             }
         }
 
-        private double momentum = 0.01;
+        private double _momentum = 0.01;
         public double Momentum
         {
-            get { return momentum; }
+            get { return _momentum; }
             set
             {
-                momentum = Math.Max(0.0, Math.Min(1.0, value));
+                _momentum = Math.Max(0.0, Math.Min(1.0, value));
             }
         }
 
-        private double[][] neuronErrors = null;
-        private double[][][] weightsUpdates = null;
-        private double[][] biasUpdates = null;
+        private double[][] _neuronErrors = null;
+        private double[][][] _weightsUpdates = null;
+        private double[][] _biasUpdates = null;
 
         public BackPropagation(Network network)
         {
-            this.network = network;
+            this._network = network;
 
-            neuronErrors = new double[network.Layers.Length][];
-            weightsUpdates = new double[network.Layers.Length][][];
-            biasUpdates = new double[network.Layers.Length][];
+            _neuronErrors = new double[network.Layers.Length][];
+            _weightsUpdates = new double[network.Layers.Length][][];
+            _biasUpdates = new double[network.Layers.Length][];
 
             for (int i = 0; i < network.Layers.Length; i++)
             {
                 Layer layer = network.Layers[i];
 
-                neuronErrors[i] = new double[layer.Neurons.Length];
-                weightsUpdates[i] = new double[layer.Neurons.Length][];
-                biasUpdates[i] = new double[layer.Neurons.Length];
+                _neuronErrors[i] = new double[layer.Neurons.Length];
+                _weightsUpdates[i] = new double[layer.Neurons.Length][];
+                _biasUpdates[i] = new double[layer.Neurons.Length];
 
-                for (int j = 0; j < weightsUpdates[i].Length; j++)
+                for (int j = 0; j < _weightsUpdates[i].Length; j++)
                 {
-                    weightsUpdates[i][j] = new double[layer.InputsCount];
+                    _weightsUpdates[i][j] = new double[layer.InputsCount];
                 }
             }
         }
 
         public double Run(double[] input, double[] output)
         {
-            network.Compute(input);
+            _network.Compute(input);
             double error = CalculateError(output);
 
             CalculateUpdates(input);
@@ -71,12 +71,12 @@ namespace TicTacToeWPF.Learning
             double[] errors, errorsNext;
             double error = 0, e, sum;
             double output;
-            int layersCount = network.Layers.Length;
+            int layersCount = _network.Layers.Length;
 
-            ActivationFunction function = (network.Layers[0].Neurons[0] as Neuron).ActivationFunction;
+            ActivationFunction function = (_network.Layers[0].Neurons[0] as Neuron).ActivationFunction;
 
-            layer = network.Layers[layersCount - 1];
-            errors = neuronErrors[layersCount - 1];
+            layer = _network.Layers[layersCount - 1];
+            errors = _neuronErrors[layersCount - 1];
 
             for (int i = 0; i < layer.Neurons.Length; i++)
             {
@@ -88,10 +88,10 @@ namespace TicTacToeWPF.Learning
             error /= layer.Neurons.Length;
             for (int j = layersCount - 2; j >= 0; j--)
             {
-                layer = network.Layers[j];
-                layerNext = network.Layers[j + 1];
-                errors = neuronErrors[j];
-                errorsNext = neuronErrors[j + 1];
+                layer = _network.Layers[j];
+                layerNext = _network.Layers[j + 1];
+                errors = _neuronErrors[j];
+                errorsNext = _neuronErrors[j + 1];
 
                 for (int i = 0; i < layer.Neurons.Length; i++)
                 {
@@ -114,13 +114,13 @@ namespace TicTacToeWPF.Learning
             double[] errors;
             double[] neuronWeightUpdates;
 
-            layer = network.Layers[0];
-            errors = neuronErrors[0];
-            layerWeightsUpdates = weightsUpdates[0];
-            layerBiasUpdates = biasUpdates[0];
+            layer = _network.Layers[0];
+            errors = _neuronErrors[0];
+            layerWeightsUpdates = _weightsUpdates[0];
+            layerBiasUpdates = _biasUpdates[0];
 
-            double cachedMomentum =  learningRate * momentum;
-            double cached1mMomentum = learningRate * (1 - momentum);
+            double cachedMomentum =  _learningRate * _momentum;
+            double cached1mMomentum = _learningRate * (1 - _momentum);
             double cachedError;
 
             for (int i = 0; i < layer.Neurons.Length; i++)
@@ -136,13 +136,13 @@ namespace TicTacToeWPF.Learning
                 layerBiasUpdates[i] = cachedMomentum * layerBiasUpdates[i] + cachedError;
             }
 
-            for (int k = 1; k < network.Layers.Length; k++)
+            for (int k = 1; k < _network.Layers.Length; k++)
             {
-                layerPrev = network.Layers[k - 1];
-                layer = network.Layers[k];
-                errors = neuronErrors[k];
-                layerWeightsUpdates = weightsUpdates[k];
-                layerBiasUpdates = biasUpdates[k];
+                layerPrev = _network.Layers[k - 1];
+                layer = _network.Layers[k];
+                errors = _neuronErrors[k];
+                layerWeightsUpdates = _weightsUpdates[k];
+                layerBiasUpdates = _biasUpdates[k];
 
                 for (int i = 0; i < layer.Neurons.Length; i++)
                 {
@@ -151,7 +151,7 @@ namespace TicTacToeWPF.Learning
 
                     for (int j = 0; j < neuronWeightUpdates.Length; j++)
                     {
-                        neuronWeightUpdates[j] = momentum * neuronWeightUpdates[j] + cachedError * layerPrev.Neurons[j].Output;
+                        neuronWeightUpdates[j] = _momentum * neuronWeightUpdates[j] + cachedError * layerPrev.Neurons[j].Output;
                     }
 
                     layerBiasUpdates[i] = cachedMomentum * layerBiasUpdates[i] + cachedError;
@@ -167,11 +167,11 @@ namespace TicTacToeWPF.Learning
             double[] layerBiasUpdates;
             double[] neuronWeightUpdates;
 
-            for (int i = 0; i < network.Layers.Length; i++)
+            for (int i = 0; i < _network.Layers.Length; i++)
             {
-                layer = network.Layers[i];
-                layerWeightsUpdates = weightsUpdates[i];
-                layerBiasUpdates = biasUpdates[i];
+                layer = _network.Layers[i];
+                layerWeightsUpdates = _weightsUpdates[i];
+                layerBiasUpdates = _biasUpdates[i];
 
                 for (int j = 0; j < layer.Neurons.Length; j++)
                 {

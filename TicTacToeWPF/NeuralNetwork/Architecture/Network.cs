@@ -7,14 +7,14 @@ namespace TicTacToeWPF.Architecture
     {
         public int InputsCount { get; protected set; }
 
-        protected int layersCount;
+        protected int _layersCount;
         public Layer[] Layers { get; protected set; }
         public double[] Output { get; protected set; }
         public Network(ActivationFunction function, int inputsCount, params int[] neuronsCount)
         {
             this.InputsCount = Math.Max(1, inputsCount);
-            this.layersCount = Math.Max(1, neuronsCount.Length);
-            this.Layers = new Layer[this.layersCount];
+            this._layersCount = Math.Max(1, neuronsCount.Length);
+            this.Layers = new Layer[this._layersCount];
             for (int i = 0; i < Layers.Length; i++)
             {
                 Layers[i] = new Layer(
@@ -42,7 +42,7 @@ namespace TicTacToeWPF.Architecture
         }
         public void Clone(Network net)
         {
-            for (int i = 0; i < net.layersCount; i++)
+            for (int i = 0; i < net._layersCount; i++)
             {
                 Layer layer = net.Layers[i];
                 for (int j = 0; j < layer.Neurons.Length; j++)

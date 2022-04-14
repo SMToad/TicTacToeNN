@@ -45,31 +45,32 @@ namespace TicTacToeWPF.Learning
             (int X, int Y) move;
             Random rand = new Random();
             double[] qValues = PredictQValues(playBoard);
-            List<int> blockedMoves = playBoard.BlockedMoves();
             List<(int X, int Y)> availableMoves = playBoard.AvailableMoves();
-            double[] qValuesCopy = qValues.Clone() as double[];
-            for (int i = 0; i < blockedMoves.Count; i++)
-                qValuesCopy[blockedMoves[i]] = Double.MinValue;
-            double maxQValue = qValuesCopy[0];
-            int maxQValueIndex = 0;
-            for (int i = 1; i < qValuesCopy.Length; i++)
-                if (qValuesCopy[i] > maxQValue)
-                {
-                    maxQValue = qValuesCopy[i];
-                    maxQValueIndex = i;
-                }
+            int moveIndex = 0;
             if (rand.NextDouble() < Epsilon)
             {
-                maxQValueIndex = rand.Next(availableMoves.Count);
-                move = availableMoves[maxQValueIndex];
+                moveIndex = rand.Next(availableMoves.Count);
+                move = availableMoves[moveIndex];
             }
             else
+            {
+                List<int> blockedMoves = playBoard.BlockedMoves();
+                for (int i = 0; i < blockedMoves.Count; i++)
+                    qValues[blockedMoves[i]] = Double.MinValue;
+                double maxQValue = qValues[0];
+                for (int i = 1; i < qValues.Length; i++)
+                    if (qValues[i] > maxQValue)
+                    {
+                        maxQValue = qValues[i];
+                        moveIndex = i;
+                    }
                 move = (
-                    maxQValueIndex / playBoard.Size,
-                    maxQValueIndex % playBoard.Size);
+                    moveIndex / playBoard.Size,
+                    moveIndex % playBoard.Size);
+            }
             return move;
         }
-        public double[] GetTargetQValues(MemoryEntry memoryEntry, float rewardValue)
+        public double[] GetTargetQValues(MemoryEntry memoryEntry)
         {
             int size = memoryEntry.State.GetLength(0);
             double[] currState = memoryEntry.State.FlattenDouble();
@@ -94,7 +95,7 @@ namespace TicTacToeWPF.Learning
             }
             else
             {
-                targetQValues[memoryEntry.Move.X * size + memoryEntry.Move.Y] = rewardValue;
+                targetQValues[memoryEntry.Move.X * size + memoryEntry.Move.Y] = memoryEntry.Reward;
             }
             return targetQValues;
         }
