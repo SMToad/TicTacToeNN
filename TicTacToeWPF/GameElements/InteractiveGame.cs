@@ -4,38 +4,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using TicTacToeWPF.Models;
 using TicTacToeWPF.Players;
 
 namespace TicTacToeWPF.GameElements
 {
-    public static class InteractiveGame
+    public class InteractiveGame: Game
     {
-        public static PlayerTurn PlayerTurn { get; set; }
-        public static Grid GridPlayBoard { get; set; }
-        public static void SwitchTurn()
+        public Grid GridPlayBoard { get; set; }
+        public new void SwitchTurn()
         {
-            switch (PlayerTurn)
-            {
-                case PlayerTurn.X:
-                    PlayerTurn = PlayerTurn.O;
-                    break;
-                case PlayerTurn.O:
-                    PlayerTurn = PlayerTurn.X;
-                    break;
-            }
+            GameModel.CurrentTurn = GameModel.CurrentTurn == PlayerTurn.X ? PlayerTurn.O : PlayerTurn.X;
         }
-        public static void StartGame(PlayBoard playBoard, (Player X, Player O) players)
+        public Player GetCurrentPlayer()
         {
-            players.X?.NewGame();
-            players.O?.NewGame();
-            PlayerTurn = PlayerTurn.X;
-            Player currentPlayer = players.X;
-            if (currentPlayer != null)
-                StartMove(playBoard, currentPlayer);
+            return GameModel.CurrentTurn == PlayerTurn.X? GameModel.Players.X: GameModel.Players.O;
         }
-        public static void StartMove(PlayBoard playBoard, Player currentPlayer)
+        public void StartGame()
         {
-            (int X, int Y) move = currentPlayer.Move(playBoard, PlayerTurn);
+            foreach (Button btn in GridPlayBoard.Children)
+                btn.Content = "";
+            GameModel.PlayBoard = new PlayBoard(GameModel.PlayBoard.Size);
+            GameModel.Players.X.NewGame();
+            GameModel.Players.O.NewGame();
+            GameModel.CurrentTurn = PlayerTurn.X;
+            StartMove();
+        }
+        public void StartMove()
+        {
+            (int X, int Y) move = GetCurrentPlayer().Move(GameModel.PlayBoard, GameModel.CurrentTurn);
+            if (GetCurrentPlayer() is Person) return;
             Button moveBtn = null;
             foreach (Button btn in GridPlayBoard.Children)
                 if (Grid.GetRow(btn) == move.X && Grid.GetColumn(btn) == move.Y)
@@ -43,25 +41,31 @@ namespace TicTacToeWPF.GameElements
                     moveBtn = btn;
                     break;
                 }
-            EndMove(playBoard, move, ref moveBtn);
+            EndMove(move, ref moveBtn);
         }
-        public static void EndMove(PlayBoard playBoard, (int X, int Y) move, ref Button moveBtn, Player currentPlayer = null)
+        public void EndMove((int X, int Y) move, ref Button moveBtn)
         {
-            playBoard.MakeMove(move, (int)PlayerTurn);
-            moveBtn.Content = PlayerTurn;
-            GameState gameState = Game.GetGameState(playBoard, move);
-            if (gameState != GameState.InGame)
+            GameModel.PlayBoard.MakeMove(move, (int)GameModel.CurrentTurn);
+            moveBtn.Content = GameModel.CurrentTurn;
+            GameModel.GameState = GetGameState(move);
+            if (GameModel.GameState != GameState.InGame)
                 EndGame();
             else
             {
                 SwitchTurn();
-                if (currentPlayer != null)
-                    StartMove(playBoard, currentPlayer);
+                StartMove();
             }
         }
-        public static void EndGame()
+        public void EndGame()
         {
-
+            GameModel.Players.X.Reward(GetGameScore(PlayerTurn.X));
+            GameModel.Players.O.Reward(GetGameScore(PlayerTurn.O));
+            foreach (Button btn in GridPlayBoard.Children)
+                btn.IsHitTestVisible = false;
+            //UpdateVisualStats(gameState);
+            GameModel.Players = (GameModel.Players.O, GameModel.Players.X);
+            //SwitchTurn();
+            //StartGame();
         }
     }
 }

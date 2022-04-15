@@ -71,11 +71,13 @@
     <Compile Include="Garbage\MinMaxPlayer.cs" />
     <Compile Include="Helpers\MemoryEntry.cs" />
     <Compile Include="Models\AppViewModel.cs" />
+    <Compile Include="Models\GameModel.cs" />
     <Compile Include="Models\GraphViewModel.cs" />
     <Compile Include="Models\TrainStats.cs" />
     <Compile Include="Models\StatsViewModel.cs" />
     <Compile Include="NeuralNetwork\Learning\QLearning.cs" />
     <Compile Include="NeuralNetwork\Training.cs" />
+    <Compile Include="Players\Person.cs" />
     <Compile Include="Players\RandomPlayer.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -91,7 +93,6 @@
     <Compile Include="GameElements\PlayBoard.cs" />
     <Compile Include="Players\BoringPlayer.cs" />
     <Compile Include="NeuralNetwork\Architecture\Layer.cs" />
-    <Compile Include="Garbage\_Learning.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

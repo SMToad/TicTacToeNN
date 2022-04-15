@@ -2,29 +2,52 @@
 using System.Linq;
 using System.Windows.Controls;
 using TicTacToeWPF.GameElements;
+using TicTacToeWPF.Models;
 using TicTacToeWPF.Players;
 
 namespace TicTacToeWPF
 {
-    public static class Game
+    public class Game
     {
-        public static float GetGameScore(PlayerTurn playerTurn, GameState gameState)
+        public GameModel GameModel { get; set; }
+        public GameState PlayRound()
         {
-            switch (gameState)
+            GameModel.Players.X.NewGame();
+            GameModel.Players.O.NewGame();
+            GameModel.CurrentTurn = PlayerTurn.X;
+            Player currentPlayer = GameModel.Players.X;
+            do
             {
-                case GameState.XWin: 
-                    return playerTurn == PlayerTurn.X? 1f : -1f;
-                case GameState.OWin:
-                    return playerTurn == PlayerTurn.O ? 1f : -1f;
-                case GameState.Tie: 
-                    return 0.5f;
-                default: return 0f;
-            }
+                (int X, int Y) move = currentPlayer.Move(GameModel.PlayBoard, GameModel.CurrentTurn);
+                GameModel.PlayBoard.MakeMove(move, (int)GameModel.CurrentTurn);
+                GameModel.GameState = GetGameState(move);
+                currentPlayer = SwitchTurn();
+            } while (GameModel.GameState == GameState.InGame);
+
+            GameModel.Players.X.Reward(GetGameScore(PlayerTurn.X));
+            GameModel.Players.O.Reward(GetGameScore(PlayerTurn.O));
+           return GameModel.GameState;
         }
-        public static GameState GetGameState(PlayBoard playBoard, (int X, int Y) lastMove)
+        public Player SwitchTurn()
         {
-            int[,] board = playBoard.Board;
-            int size = playBoard.Size;
+            Player nextPlayer = null;
+            switch (GameModel.CurrentTurn)
+            {
+                case PlayerTurn.X:
+                    GameModel.CurrentTurn = PlayerTurn.O;
+                    nextPlayer = GameModel.Players.O;
+                    break;
+                case PlayerTurn.O:
+                    GameModel.CurrentTurn = PlayerTurn.X;
+                    nextPlayer = GameModel.Players.X;
+                    break;
+            }
+            return nextPlayer;
+        }
+        public GameState GetGameState((int X, int Y) lastMove)
+        {
+            int[,] board = GameModel.PlayBoard.Board;
+            int size = GameModel.PlayBoard.Size;
             int rowSum = 0, colSum = 0, diagSum = 0;
             for (int i = 0; i < size; i++)
             {
@@ -46,7 +69,7 @@ namespace TicTacToeWPF
             {
                 return GameState.OWin;
             }
-            else if (playBoard.AvailableMoves().Count != 0)
+            else if (GameModel.PlayBoard.AvailableMoves().Count != 0)
             {
                 return GameState.InGame;
             }
@@ -55,41 +78,21 @@ namespace TicTacToeWPF
                 return GameState.Tie;
             }
         }
-        public static Player SwitchTurn((Player X, Player O) players, ref PlayerTurn currentTurn)
+        public float GetGameScore(PlayerTurn playerTurn)
         {
-            Player nextPlayer = null;
-            switch (currentTurn)
+            switch (GameModel.GameState)
             {
-                case PlayerTurn.X:
-                    currentTurn = PlayerTurn.O;
-                    nextPlayer = players.O;
-                    break;
-                case PlayerTurn.O:
-                    currentTurn = PlayerTurn.X;
-                    nextPlayer = players.X;
-                    break;
+                case GameState.XWin: 
+                    return playerTurn == PlayerTurn.X? 1f : -1f;
+                case GameState.OWin:
+                    return playerTurn == PlayerTurn.O ? 1f : -1f;
+                case GameState.Tie: 
+                    return 0.5f;
+                default: return 0f;
             }
-            return nextPlayer;
         }
-        public static GameState Play(PlayBoard playBoard, (Player X, Player O) players)
-        {
-            players.X.NewGame();
-            players.O.NewGame();
-            PlayerTurn currentTurn = PlayerTurn.X;
-            Player currentPlayer = players.X;
-            GameState gameState;
-            do
-            {
-                (int X, int Y) move = currentPlayer.Move(playBoard, currentTurn);
-                playBoard.MakeMove(move, (int)currentTurn);
-                gameState = GetGameState(playBoard, move);
-                currentPlayer = SwitchTurn(players, ref currentTurn);
-            } while (gameState == GameState.InGame);
-            
-           players.X.Reward(GetGameScore(PlayerTurn.X, gameState));
-           players.O.Reward(GetGameScore(PlayerTurn.O, gameState));
-           return gameState;
-        }
+        
+        
     }
 }
 
