@@ -29,27 +29,26 @@ namespace TicTacToeWPF.Players
                 QLearning.CloneNetwork();
             Training.EmptyBuffer();
         }
-        public override (int X, int Y) Move(PlayBoard playBoard, PlayerTurn currentTurn)
+        public override void Move(PlayBoard playBoard, PlayerTurn currentTurn)
         {
-            if (currentTurn == PlayerTurn.O) playBoard.Invert();
-            (int X, int Y) move = QLearning.PredictMove(playBoard);
-            Training.MemoryBuffer.Add(new MemoryEntry()
+            if (currentTurn == PlayerTurn.O) playBoard.InvertValues();
+            LastMove = QLearning.PredictMove(playBoard);
+            Training.MemoryBuffer.Add(new MemoryEntry(playBoard.Size)
             {
-                Move = move,
-                State = playBoard.Board
+                Move = LastMove,
+                State = playBoard.GetBoardArray()
             });
-            if (currentTurn == PlayerTurn.O) playBoard.Invert();
-            return move;
+            if (currentTurn == PlayerTurn.O) playBoard.InvertValues();
         }
         public override void Reward(float rewardValue)
         {
-            Training.MemoryBuffer.AddEndGameData(rewardValue);
+            Training.MemoryBuffer.AddRewardData(rewardValue);
             if (!InTraining) return;
             MemoryBuffer trainBuffer = Training.GetTrainBuffer();
 
             for (int i = 0; i < trainBuffer.Size - 1; i++)
             {
-                double[] currState = trainBuffer.History[i].State.FlattenDouble();
+                double[] currState = trainBuffer.History[i].State.ToDouble();
                 Training.Train(currState, QLearning.GetTargetQValues(trainBuffer.History[i]));
             }
            QLearning.DecreaseEpsilon();

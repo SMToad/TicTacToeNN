@@ -38,7 +38,7 @@ namespace TicTacToeWPF.Learning
             TargetNetwork.Clone(Network);
         }
         public double[] PredictQValues(PlayBoard playBoard) => 
-            Network.Compute(playBoard.Board.FlattenDouble());
+            Network.Compute(playBoard.GetBoardArray().ToDouble());
         public void CloneNetwork() => TargetNetwork.Clone(Network);
         public (int X, int Y) PredictMove(PlayBoard playBoard)
         {
@@ -54,7 +54,7 @@ namespace TicTacToeWPF.Learning
             }
             else
             {
-                List<int> blockedMoves = playBoard.BlockedMoves();
+                List<int> blockedMoves = playBoard.BlockedMovesIndexes();
                 for (int i = 0; i < blockedMoves.Count; i++)
                     qValues[blockedMoves[i]] = Double.MinValue;
                 double maxQValue = qValues[0];
@@ -72,13 +72,12 @@ namespace TicTacToeWPF.Learning
         }
         public double[] GetTargetQValues(MemoryEntry memoryEntry)
         {
-            int size = memoryEntry.State.GetLength(0);
-            double[] currState = memoryEntry.State.FlattenDouble();
-            double[] targetQValues = Network.Compute(currState).Clone() as double[];
+            double[] currState = memoryEntry.State.ToDouble();
+            double[] targetQValues = Network.Compute(currState);
             if (memoryEntry.NextState != null)
             {
-                double[] nextState = memoryEntry.NextState.FlattenDouble();
-                double[] nextQValues = (TargetNetwork.Compute(nextState)).Clone() as double[];
+                double[] nextState = memoryEntry.NextState.ToDouble();
+                double[] nextQValues = TargetNetwork.Compute(nextState);
                 for (int j = 0; j < nextQValues.Length; j++)
                 {
                     if (Math.Abs(nextState[j]) == 1)
@@ -89,13 +88,13 @@ namespace TicTacToeWPF.Learning
                 double maxQValue = Double.MinValue;
                 for (int j = 0; j < nextQValues.Length; j++)
                     if (nextQValues[j] > maxQValue) maxQValue = nextQValues[j];
-                targetQValues[memoryEntry.Move.X * size + memoryEntry.Move.Y] = maxQValue * Gamma;
+                targetQValues[memoryEntry.GetMoveIndex()] = maxQValue * Gamma;
 
-                targetQValues[memoryEntry.Move.X * size + memoryEntry.Move.Y] +=  memoryEntry.Reward;
+                targetQValues[memoryEntry.GetMoveIndex()] +=  memoryEntry.Reward;
             }
             else
             {
-                targetQValues[memoryEntry.Move.X * size + memoryEntry.Move.Y] = memoryEntry.Reward;
+                targetQValues[memoryEntry.GetMoveIndex()] = memoryEntry.Reward;
             }
             return targetQValues;
         }

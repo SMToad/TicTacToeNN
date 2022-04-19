@@ -7,8 +7,9 @@ namespace TicTacToeWPF.Players
 {
     public abstract class Player
     {
+        public (int X, int Y) LastMove { get; set; }
         public virtual void NewGame() { }
         public virtual void Reward(float rewardValue) { }
-        public abstract (int X, int Y) Move(PlayBoard playBoard, PlayerTurn currentTurn);
+        public abstract void Move(PlayBoard playBoard, PlayerTurn currentTurn);
     }
 }

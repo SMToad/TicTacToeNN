@@ -8,46 +8,67 @@ namespace TicTacToeWPF.GameElements
 {
     public class PlayBoard
     {
-        public int[,] Board { get; private set; }
+        public List<(int X, int Y)> PlayedMoves { get; set; }
+        public List<int> PlayedValues { get; set; }
    
         public int Size { get; set; }
         public PlayBoard(int size = 3)
         {
             Size = size;
-            Board = new int[Size, Size];
+            PlayedMoves = new List<(int X, int Y)>(size * size);
+            PlayedValues = new List<int>(size * size);
+        }
+        public void InvertValues()
+        {
+            for(int i=0; i < PlayedValues.Count; i++)
+                PlayedValues[i] *= -1;
+        }
+        public int[,] GetBoard()
+        {
+            int[,] board = new int[Size, Size];
             for (int i = 0; i < Size; i++)
                 for (int j = 0; j < Size; j++)
-                    Board[i, j] = 0;
+                {
+                    int index = PlayedMoves.IndexOf((i, j));
+                    if (index != -1)
+                        board[i, j] = PlayedValues[index];
+                    else board[i, j] = 0;
+                }
+            return board;
         }
-        public PlayBoard(int[,] values)
+        public int[] GetBoardArray()
         {
-            Size = values.GetLength(0);
-            Board = new int[Size, Size];
+            int[] board = new int[Size * Size];
             for (int i = 0; i < Size; i++)
                 for (int j = 0; j < Size; j++)
-                    Board[i, j] = values[i,j];
+                {
+                    int index = PlayedMoves.IndexOf((i, j));
+                    if (index != -1)
+                        board[i * Size + j] = PlayedValues[index];
+                    else board[i * Size + j] = 0;
+                }
+            return board;
         }
-        public void Invert()
+        public List<(int X, int Y)> AvailableMoves() 
         {
+            List<(int X, int Y)> moves = new List<(int X, int Y)> ();
             for (int i = 0; i < Size; i++)
                 for (int j = 0; j < Size; j++)
-                    Board[i, j] *= -1;
+                    if (PlayedMoves.IndexOf((i, j)) == -1)
+                        moves.Add((i, j));
+            return moves;
         }
-        public List<(int X, int Y)> GetMoves(bool isAvailable)
+
+        public List<int> BlockedMovesIndexes()
         {
-            List<(int X, int Y)> res = new List<(int, int)>();
-            for (int i = 0; i < Size; i++)
-                for (int j = 0; j < Size; j++)
-                    if (!(Board[i, j] == 0 ^ isAvailable)) res.Add((i, j));
-            return res;
+            int[] board = GetBoardArray();
+            return board.Where(x => x == 0).Select(x => Array.IndexOf(board, x)).ToList();
         }
-        public List<(int X, int Y)> AvailableMoves() =>  GetMoves(true);
-        
-        public List<int> BlockedMoves() => GetMoves(false).Flatten(Size);
-        
-        public void MakeMove((int X, int Y) move, int value)
+
+        public void PlaceMove((int X, int Y) move, PlayerTurn playerTurn)
         {
-            Board[move.X, move.Y] = value;
+            PlayedMoves.Add(move);
+            PlayedValues.Add((int)playerTurn);
         }
     }
 }

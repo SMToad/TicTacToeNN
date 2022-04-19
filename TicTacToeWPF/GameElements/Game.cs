@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 using TicTacToeWPF.GameElements;
@@ -10,44 +11,33 @@ namespace TicTacToeWPF
     public class Game
     {
         public GameModel GameModel { get; set; }
-        public GameState PlayRound()
+
+        public GameState Play()
         {
-            GameModel.Players.X.NewGame();
-            GameModel.Players.O.NewGame();
-            GameModel.CurrentTurn = PlayerTurn.X;
-            Player currentPlayer = GameModel.Players.X;
+            List<Player> players = GameModel.CopyPlayers();
+            GameModel.Players.ForEach(p => p.NewGame());
             do
             {
-                (int X, int Y) move = currentPlayer.Move(GameModel.PlayBoard, GameModel.CurrentTurn);
-                GameModel.PlayBoard.MakeMove(move, (int)GameModel.CurrentTurn);
-                GameModel.GameState = GetGameState(move);
-                currentPlayer = SwitchTurn();
+                Player currentPlayer = players.First();
+                currentPlayer.Move(GameModel.PlayBoard, GameModel.CurrentTurn);
+                GameModel.PlaceMoveOnBoard(currentPlayer);
+                GameModel.GameState = GetGameState();
+                players.Reverse();
             } while (GameModel.GameState == GameState.InGame);
-
-            GameModel.Players.X.Reward(GetGameScore(PlayerTurn.X));
-            GameModel.Players.O.Reward(GetGameScore(PlayerTurn.O));
+            RewardPlayers();
            return GameModel.GameState;
         }
-        public Player SwitchTurn()
+        public void RewardPlayers()
         {
-            Player nextPlayer = null;
-            switch (GameModel.CurrentTurn)
-            {
-                case PlayerTurn.X:
-                    GameModel.CurrentTurn = PlayerTurn.O;
-                    nextPlayer = GameModel.Players.O;
-                    break;
-                case PlayerTurn.O:
-                    GameModel.CurrentTurn = PlayerTurn.X;
-                    nextPlayer = GameModel.Players.X;
-                    break;
-            }
-            return nextPlayer;
+            GameModel.Players.First().Reward(GetGameScore(PlayerTurn.X));
+            GameModel.Players.Last().Reward(GetGameScore(PlayerTurn.O));
         }
-        public GameState GetGameState((int X, int Y) lastMove)
+        public GameState GetGameState()
         {
-            int[,] board = GameModel.PlayBoard.Board;
+            int[,] board = GameModel.PlayBoard.GetBoard();
+            List<(int X, int Y)> playedCells = GameModel.PlayBoard.PlayedMoves;
             int size = GameModel.PlayBoard.Size;
+            (int X, int Y) lastMove = playedCells.Last();
             int rowSum = 0, colSum = 0, diagSum = 0;
             for (int i = 0; i < size; i++)
             {
@@ -91,8 +81,6 @@ namespace TicTacToeWPF
                 default: return 0f;
             }
         }
-        
-        
     }
 }
 

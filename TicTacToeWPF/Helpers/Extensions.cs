@@ -6,14 +6,9 @@ namespace TicTacToeWPF.Helpers
 {
     public static class Extensions
     {
-        public static int[] Flatten(this int[,] array) => array.Cast<int>().ToArray();
-        public static double[] FlattenDouble(this int[,] array)
+        public static double[] ToDouble(this int[] array)
         {
-            return array.Flatten().Select(x => (double)x).ToArray();
-        }
-        public static List<int> Flatten(this List<(int, int)> list, int size)
-        {
-            return list.Select(x => x.Item1 * size + x.Item2).ToList();
+            return array.Select(x => (double)x).ToArray();
         }
         public static double ToPercent(this int currAmount, int totalAmount)
         {

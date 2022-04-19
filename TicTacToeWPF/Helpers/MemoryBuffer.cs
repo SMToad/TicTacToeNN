@@ -26,7 +26,7 @@ namespace TicTacToeWPF
             }
             else Size++;
             History.Add(memoryEntry);
-            if (Size > 1)
+            if (Size > 1 && memoryEntry.Reward == 0)
                 History[Size - 2].NextState = memoryEntry.State;
         }
         public void Add(MemoryBuffer buffer)
@@ -53,9 +53,8 @@ namespace TicTacToeWPF
             }
             return sample;
         }
-        public void AddEndGameData(float rewardValue)
+        public void AddRewardData(float rewardValue)
         {
-            History[Size - 1].NextState = null;
             for (int i = Size - 1; i > -1; i--)
                 History[i].Reward = rewardValue / (Size - i);
         }

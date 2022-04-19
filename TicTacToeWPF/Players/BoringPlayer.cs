@@ -7,7 +7,10 @@ namespace TicTacToeWPF.Players
 {
     class BoringPlayer: Player
     {
-        public override (int X, int Y) Move(PlayBoard playBoard, PlayerTurn currentTurn) => playBoard.AvailableMoves()[0];
+        public override void Move(PlayBoard playBoard, PlayerTurn currentTurn)
+        {
+            LastMove = playBoard.AvailableMoves()[0];
+        }
         
     }
 }

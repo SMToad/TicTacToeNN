@@ -11,8 +11,8 @@ namespace TicTacToeWPF.Models
 {
     public class AppViewModel
     {
-        
-        
+        public Person Person { get; set; }
+        public Player TrainOpponent { get; set; }
         public int TrainRounds { get; set; }
         public int TotalRounds { get; set; }
     }

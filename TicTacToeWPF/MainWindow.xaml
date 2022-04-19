@@ -21,10 +21,21 @@
                 <ColumnDefinition Width="6*"/>
                 <ColumnDefinition Width="5*"/>
             </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Row="0"
-                    Grid.Column="0">
-                <StackPanel Orientation="Horizontal">
+            <Grid Name="gridControlPanel">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="2"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            HorizontalAlignment="Center">
                     <Label Content="Размер игры:"/>
                     <TextBox Name="tbPlayBoardSize" 
                          Width="20" 
@@ -33,6 +44,22 @@
                          FontSize="12" 
                          TextAlignment="Center" 
                          Background="Snow"/>
+                </StackPanel>
+                <Button Name="btnStartGame" 
+                        Height="30" 
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center" 
+                        Content="Начать игру" 
+                        Background="Lavender"
+                        Click="btnStartGame_Clicked" />
+                <StackPanel Background="Silver"
+                       Grid.Column="1"
+                       Grid.RowSpan="3"/>
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            HorizontalAlignment="Center">
                     <Label Content="Соперник:"/>
                     <ComboBox Name="cbOpponent"
                           Height="23" 
@@ -51,19 +78,22 @@
                     <TextBox Name="tbTotalRounds" 
                          Width="auto" 
                          Height="20"
-                         Text="2500" 
+                         Text="100" 
                          FontSize="12" 
                          TextAlignment="Center" 
                          Background="Snow"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Button Name="btnStart" 
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            HorizontalAlignment="Center">
+                    <Button Name="btnStartTrain" 
                         Height="30" 
                         Grid.Row="0" 
                         HorizontalAlignment="Left" 
-                        Content="Начать" 
+                        Content="Начать обучение" 
                         Background="Lavender"
-                        Click="btnStart_Clicked" />
+                        Click="btnStartTrain_Clicked" />
                     <Button Name="btnStop" 
                         Height="30" 
                         Grid.Row="0" 
@@ -79,6 +109,15 @@
                         Background="Lavender" 
                         Click="btnResetNet_Clicked" />
                 </StackPanel>
+                <StackPanel Background="Silver"
+                            Grid.Row="2"
+                       Grid.RowSpan="2"
+                       Grid.ColumnSpan="3"/>
+            </Grid>
+            <StackPanel Grid.Row="0"
+                    Grid.Column="0">
+               
+                
             </StackPanel>
             <Grid Name="gridPlayBoard" 
               Grid.Row="1" 
@@ -102,7 +141,7 @@
                        Grid.Row="0" 
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       Text="Раунд"  
+                       Text=""  
                        FontSize="18"  />
                 <oxy:Plot Name="pltResultGraph" 
                       Grid.Row="1" 

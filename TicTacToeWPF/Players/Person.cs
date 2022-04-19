@@ -3,41 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using TicTacToeWPF.GameElements;
 
 namespace TicTacToeWPF.Players
 {
     public class Person: Player
     {
-        public Label LbStatusBar { get; set; }
-        public Person(Label lbStatusBar)
+        public string StatusBarLabel { get; set; }
+        public override void NewGame()
         {
-            LbStatusBar = lbStatusBar;
+            StatusBarLabel = "Игра против сети. ";
         }
-        public override void NewGame() 
+        public override void Move(PlayBoard playBoard, PlayerTurn currentTurn)
         {
-            LbStatusBar.Content += "Ваш ход. ";
+            StatusBarLabel += "Ваш ход. ";
+            
         }
-        public override void Reward(float rewardValue) 
+        public override void Reward(float rewardValue)
         {
             switch (rewardValue)
             {
                 case 1f:
-                    LbStatusBar.Content = "Вы победили! ";
+                    StatusBarLabel = "Поздравляем, Вы победили!";
                     break;
                 case -1f:
-                    LbStatusBar.Content = "Сеть победила! ";
+                    StatusBarLabel = "Увы, Вы проиграли.";
                     break;
                 case 0.5f:
-                    LbStatusBar.Content = "Ничья. ";
+                    StatusBarLabel = "Ничья!";
                     break;
             }
-        }
-        public override (int X, int Y) Move(PlayBoard playBoard, PlayerTurn currentTurn) 
-        {
-            LbStatusBar.Content = "Сеть приняла решение. Ваш ход. ";
-            return (-1, -1);
         }
     }
 }
