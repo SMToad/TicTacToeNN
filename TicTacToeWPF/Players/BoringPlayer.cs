@@ -9,7 +9,7 @@ namespace TicTacToeWPF.Players
     {
         public override void Move(PlayBoard playBoard, PlayerTurn currentTurn)
         {
-            LastMove = playBoard.AvailableMoves()[0];
+            playBoard.PlaceMove(playBoard.AvailableMoves()[0], currentTurn);
         }
         
     }

@@ -17,7 +17,6 @@ namespace TicTacToeWPF.Players
         public override void Move(PlayBoard playBoard, PlayerTurn currentTurn)
         {
             StatusBarLabel += "Ваш ход. ";
-            
         }
         public override void Reward(float rewardValue)
         {

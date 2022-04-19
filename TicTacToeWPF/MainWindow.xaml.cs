@@ -56,7 +56,7 @@ namespace TicTacToeWPF
 
             timer = new DispatcherTimer();
             timer.Tick += new EventHandler(timer_Tick);
-            timer.Interval = TimeSpan.FromSeconds(0.001);
+            timer.Interval = TimeSpan.FromSeconds(0.1);
 
             cbOpponent.ItemsSource = new List<string>() { "Рандом", "Подряд", "Сама с собой" };
 
@@ -88,12 +88,12 @@ namespace TicTacToeWPF
 
             if (trainStats.RoundsCount % appViewModel.TrainRounds == 0)
             {
-                if (!gameModel.GetAgent().InTraining)
+                if (!gameModel.Get<Agent>().InTraining)
                 {
                     StatsViewModel stats = new StatsViewModel(trainStats, appViewModel.TrainRounds);
                     lvResultTable.Items.Add(stats);
                 }
-                gameModel.GetAgent().ToggleTraining();
+                gameModel.Get<Agent>().ToggleTraining();
                 graphViewModel.Add(trainStats, appViewModel.TrainRounds);
                 pltResultGraph.InvalidatePlot(true);
                 trainStats.ClearResults();
@@ -151,10 +151,10 @@ namespace TicTacToeWPF
         {
             Button btn = sender as Button;
             if (btn.Content != null && btn.Content.ToString() != "") return;
+
             (int X, int Y) move = (Grid.GetRow(btn), Grid.GetColumn(btn));
-            appViewModel.Person.LastMove = move;
-            PlaceMoveOnGrid(move, gameModel.CurrentTurn);
             btn.Content = gameModel.CurrentTurn;
+            gameModel.PlayBoard.PlaceMove(move, gameModel.CurrentTurn);
             lbStatusBar.Content = "Ваш ход сделан. Ожидание хода сети...";
             gameInteractive.EndMove();
             UpdateInteractiveStats();
@@ -171,7 +171,7 @@ namespace TicTacToeWPF
                     appViewModel.TrainOpponent = new BoringPlayer();
                     break;
                 case 2:
-                    appViewModel.TrainOpponent = gameModel.GetAgent();
+                    appViewModel.TrainOpponent = gameModel.Get<Agent>();
                     break;
             }
         }
@@ -188,7 +188,7 @@ namespace TicTacToeWPF
             List<int> playedValues = gameModel.PlayBoard.PlayedValues;
             if(gameModel.GameState != GameState.InGame)
             {
-                if (gameModel.Players.First() is Agent)
+                if (gameModel.GetCurrentPlayer() is Agent)
                     PlaceMoveOnGrid(playedMoves.Last(), (PlayerTurn)playedValues.Last());
                 AllowGridClick(false);
                 gameModel.SwitchPlayers();
@@ -216,7 +216,7 @@ namespace TicTacToeWPF
         }
         void ResetNet()
         {
-            gameModel.SetAgent(new Agent(gameModel.PlayBoard.Size));
+            gameModel.Set<Agent>(new Agent(gameModel.PlayBoard.Size));
             lbStatusBar.Content = "Сеть обновлена. ";
         }
         int GetPlayBoardSizeInput()
@@ -259,7 +259,7 @@ namespace TicTacToeWPF
                 GameModel = gameModel
             };
             gameInteractive.StartGame();
-            lbStatusBar.Content = appViewModel.Person.StatusBarLabel;
+            lbStatusBar.Content = gameModel.Get<Person>().StatusBarLabel;
             UpdateInteractiveStats();
         }
         void btnStartTrain_Clicked(object sender, RoutedEventArgs args)
@@ -267,7 +267,7 @@ namespace TicTacToeWPF
             ClearVisualStats();
             UpdatePlayBoardSize();
             UpdateTotalRounds();
-            gameModel.Players[0] = gameModel.GetAgent();
+            gameModel.Players[0] = gameModel.Get<Agent>();
             gameModel.Players[1] = appViewModel.TrainOpponent;
             game = new Game()
             {

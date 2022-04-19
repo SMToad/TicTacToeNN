@@ -32,12 +32,13 @@ namespace TicTacToeWPF.Players
         public override void Move(PlayBoard playBoard, PlayerTurn currentTurn)
         {
             if (currentTurn == PlayerTurn.O) playBoard.InvertValues();
-            LastMove = QLearning.PredictMove(playBoard);
+            (int X, int Y) move = QLearning.PredictMove(playBoard);
             Training.MemoryBuffer.Add(new MemoryEntry(playBoard.Size)
             {
-                Move = LastMove,
+                Move = move,
                 State = playBoard.GetBoardArray()
             });
+            playBoard.PlaceMove(move, PlayerTurn.X);
             if (currentTurn == PlayerTurn.O) playBoard.InvertValues();
         }
         public override void Reward(float rewardValue)

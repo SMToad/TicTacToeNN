@@ -12,38 +12,28 @@ namespace TicTacToeWPF.Models
     {
         public PlayBoard PlayBoard { get; set; }
         public List<Player> Players { get; set; }
-        public PlayerTurn CurrentTurn
-        {
-            get
-            {
-                if (PlayBoard.PlayedValues.Count > 0)
-                    return (PlayerTurn)(PlayBoard.PlayedValues.Last() * -1);
-                else return PlayerTurn.X;
-            }
-        }
+        public PlayerTurn CurrentTurn { get; private set; } = PlayerTurn.X;
+        
         public GameState GameState { get; set; }
-        public void PlaceMoveOnBoard(Player player)
+        public void UpdateCurrentTurn() => CurrentTurn = (PlayerTurn)((int)CurrentTurn * -1);
+        public Player GetCurrentPlayer()
         {
-            PlayBoard.PlaceMove(player.LastMove, CurrentTurn);
+            return (CurrentTurn == PlayerTurn.X)? Players.First(): Players.Last();
         }
-        public Agent GetAgent()
+        public T Get<T>() where T : Player
         {
-            return ((Players.First() is Agent) ? Players.First() : Players.Last()) as Agent;
+            return ((Players.First() is T) ? Players.First() : Players.Last()) as T;
         }
-        public void SetAgent(Agent agent)
+        public void Set<T>(T player) where T : Player
         {
-            if (Players.First() is Agent) Players[0] = agent;
-            else Players[1] = agent;
+            if (Players.First() is T) Players[0] = player;
+            else Players[1] = player;
         }
         public void SwitchPlayers()
         {
             Players.Reverse();
+            CurrentTurn = PlayerTurn.X;
         }
-        public List<Player> CopyPlayers()
-        {
-            List<Player> copy = new List<Player>(2);
-            Players.ForEach(p => copy.Add(p));
-            return copy;
-        }
+        
     }
 }

@@ -11,7 +11,7 @@ namespace TicTacToeWPF.Players
             Random rand = new Random();
             List<(int X, int Y)> moves = playBoard.AvailableMoves();
             int k = rand.Next(moves.Count);
-            LastMove = moves[k];
+            playBoard.PlaceMove(moves[k], currentTurn);
             
         }
     }

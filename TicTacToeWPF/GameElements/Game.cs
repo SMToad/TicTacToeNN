@@ -14,15 +14,13 @@ namespace TicTacToeWPF
 
         public GameState Play()
         {
-            List<Player> players = GameModel.CopyPlayers();
             GameModel.Players.ForEach(p => p.NewGame());
             do
             {
-                Player currentPlayer = players.First();
+                Player currentPlayer = GameModel.GetCurrentPlayer();
                 currentPlayer.Move(GameModel.PlayBoard, GameModel.CurrentTurn);
-                GameModel.PlaceMoveOnBoard(currentPlayer);
                 GameModel.GameState = GetGameState();
-                players.Reverse();
+                GameModel.UpdateCurrentTurn();
             } while (GameModel.GameState == GameState.InGame);
             RewardPlayers();
            return GameModel.GameState;
@@ -35,9 +33,9 @@ namespace TicTacToeWPF
         public GameState GetGameState()
         {
             int[,] board = GameModel.PlayBoard.GetBoard();
-            List<(int X, int Y)> playedCells = GameModel.PlayBoard.PlayedMoves;
+            List<(int X, int Y)> playedMoves = GameModel.PlayBoard.PlayedMoves;
             int size = GameModel.PlayBoard.Size;
-            (int X, int Y) lastMove = playedCells.Last();
+            (int X, int Y) lastMove = playedMoves.Last();
             int rowSum = 0, colSum = 0, diagSum = 0;
             for (int i = 0; i < size; i++)
             {

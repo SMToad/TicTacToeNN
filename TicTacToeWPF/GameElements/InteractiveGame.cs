@@ -20,20 +20,18 @@ namespace TicTacToeWPF.GameElements
         }
         public void StartMove()
         {
-            GameModel.Players.First().Move(GameModel.PlayBoard, GameModel.CurrentTurn);
-            if(GameModel.Players.First() is Agent)
+            GameModel.GetCurrentPlayer().Move(GameModel.PlayBoard, GameModel.CurrentTurn);
+            if(GameModel.GetCurrentPlayer() is Agent)
                 EndMove();
         }
         public void EndMove()
         {
-            GameModel.PlaceMoveOnBoard(GameModel.Players.First());
             GameModel.GameState = GetGameState();
             if (GameModel.GameState != GameState.InGame)
                 RewardPlayers();
             else
             {
-                GameModel.SwitchPlayers();
-                //await Task.Delay(TimeSpan.FromSeconds(2));
+                GameModel.UpdateCurrentTurn();
                 StartMove();
             }
         }

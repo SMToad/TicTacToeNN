@@ -62,7 +62,10 @@ namespace TicTacToeWPF.GameElements
         public List<int> BlockedMovesIndexes()
         {
             int[] board = GetBoardArray();
-            return board.Where(x => x == 0).Select(x => Array.IndexOf(board, x)).ToList();
+            List<int> blockedMoves = new List<int>();
+            for (int i = 0; i < board.Length; i++)
+                if (board[i] != 0) blockedMoves.Add(i);
+            return blockedMoves;
         }
 
         public void PlaceMove((int X, int Y) move, PlayerTurn playerTurn)
