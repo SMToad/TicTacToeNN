@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using TicTacToeWPF.GameElements;
 using TicTacToeWPF.Models;
 using TicTacToeWPF.Players;
+using TicTacToeWPF.Helpers;
 
 namespace TicTacToeWPF
 {
@@ -68,16 +69,8 @@ namespace TicTacToeWPF
         }
         public float GetGameScore(PlayerTurn playerTurn)
         {
-            switch (GameModel.GameState)
-            {
-                case GameState.XWin: 
-                    return playerTurn == PlayerTurn.X? 1f : -1f;
-                case GameState.OWin:
-                    return playerTurn == PlayerTurn.O ? 1f : -1f;
-                case GameState.Tie: 
-                    return 0.5f;
-                default: return 0f;
-            }
+            float score = GameModel.GameState.ToFloat();
+            return Math.Abs(score) == 1? score * (int)playerTurn : score;
         }
     }
 }

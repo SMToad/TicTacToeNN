@@ -70,7 +70,7 @@
     <Compile Include="Helpers\MemoryBuffer.cs" />
     <Compile Include="Garbage\MinMaxPlayer.cs" />
     <Compile Include="Helpers\MemoryEntry.cs" />
-    <Compile Include="Models\AppViewModel.cs" />
+    <Compile Include="Models\InputViewModel.cs" />
     <Compile Include="Models\GameModel.cs" />
     <Compile Include="Models\GraphViewModel.cs" />
     <Compile Include="Models\TrainStats.cs" />

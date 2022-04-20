@@ -31,7 +31,7 @@ namespace TicTacToeWPF
         InteractiveGame gameInteractive;
         DispatcherTimer timer;
 
-        AppViewModel appViewModel;
+        InputViewModel inputViewModel;
         GraphViewModel graphViewModel;
         TrainStats trainStats;
 
@@ -45,20 +45,15 @@ namespace TicTacToeWPF
                 Players = new List<Player>(2)
             };
 
-            appViewModel = new AppViewModel()
-            {
-                Person = new Person(),
-                TrainOpponent = new RandomPlayer(),
-                TrainRounds = 50
-            };
+            inputViewModel = new InputViewModel();
+            DataContext = inputViewModel;
             gameModel.Players.Add(new Agent());
-            gameModel.Players.Add(appViewModel.Person);
+            gameModel.Players.Add(new Person());
 
             timer = new DispatcherTimer();
             timer.Tick += new EventHandler(timer_Tick);
-            timer.Interval = TimeSpan.FromSeconds(0.1);
+            timer.Interval = TimeSpan.FromSeconds(0.01);
 
-            cbOpponent.ItemsSource = new List<string>() { "Рандом", "Подряд", "Сама с собой" };
 
             graphViewModel = new GraphViewModel()
             {
@@ -86,19 +81,19 @@ namespace TicTacToeWPF
                     if(board[i,j] != 0)
                         PlaceMoveOnGrid((i, j), (PlayerTurn)board[i, j]);
 
-            if (trainStats.RoundsCount % appViewModel.TrainRounds == 0)
+            if (trainStats.RoundsCount % inputViewModel.TrainStep == 0)
             {
                 if (!gameModel.Get<Agent>().InTraining)
                 {
-                    StatsViewModel stats = new StatsViewModel(trainStats, appViewModel.TrainRounds);
+                    StatsViewModel stats = new StatsViewModel(trainStats, inputViewModel.TrainStep);
                     lvResultTable.Items.Add(stats);
                 }
                 gameModel.Get<Agent>().ToggleTraining();
-                graphViewModel.Add(trainStats, appViewModel.TrainRounds);
+                graphViewModel.Add(trainStats, inputViewModel.TrainStep);
                 pltResultGraph.InvalidatePlot(true);
                 trainStats.ClearResults();
             }
-            if (trainStats.RoundsCount == appViewModel.TotalRounds)
+            if (trainStats.RoundsCount == inputViewModel.RoundsAmount)
             {
                 timer.Stop();
                 lbStatusBar.Content = "Обучение завершено. ";
@@ -147,7 +142,7 @@ namespace TicTacToeWPF
             foreach (Button btn in gridPlayBoard.Children)
                 btn.Content = "";
         }
-        void btnGrid_Click(object sender, RoutedEventArgs args)
+        async void btnGrid_Click(object sender, RoutedEventArgs args)
         {
             Button btn = sender as Button;
             if (btn.Content != null && btn.Content.ToString() != "") return;
@@ -155,25 +150,11 @@ namespace TicTacToeWPF
             (int X, int Y) move = (Grid.GetRow(btn), Grid.GetColumn(btn));
             btn.Content = gameModel.CurrentTurn;
             gameModel.PlayBoard.PlaceMove(move, gameModel.CurrentTurn);
-            lbStatusBar.Content = "Ваш ход сделан. Ожидание хода сети...";
+            lbStatusBar.Content = "Ваш ход сделан. Анализ игрового поля...";
+            await Task.Delay(TimeSpan.FromSeconds(1.5));
+            gameModel.Get<Person>().StatusBarLabel = "Сеть сделала свой выбор. ";
             gameInteractive.EndMove();
             UpdateInteractiveStats();
-        }
-
-        void cbOpponent_SelectionChanged(object sender, SelectionChangedEventArgs args)
-        {
-            switch (cbOpponent.SelectedIndex)
-            {
-                case 0:
-                    appViewModel.TrainOpponent = new RandomPlayer();
-                    break;
-                case 1:
-                    appViewModel.TrainOpponent = new BoringPlayer();
-                    break;
-                case 2:
-                    appViewModel.TrainOpponent = gameModel.Get<Agent>();
-                    break;
-            }
         }
         void PlaceMoveOnGrid((int X, int Y) move, PlayerTurn playerTurn)
         {
@@ -196,11 +177,8 @@ namespace TicTacToeWPF
             else if (gameModel.PlayBoard.PlayedMoves.Count > 0)
             {
                 PlaceMoveOnGrid(playedMoves.Last(), (PlayerTurn)playedValues.Last());
-                lbStatusBar.Content = "Сеть сделала свой выбор. ";
             }
-            lbStatusBar.Content += appViewModel.Person.StatusBarLabel;
-            
-            
+            lbStatusBar.Content = gameModel.Get<Person>().StatusBarLabel;
         }
         void timer_Tick(object sender, EventArgs args)
         {
@@ -219,29 +197,24 @@ namespace TicTacToeWPF
             gameModel.Set<Agent>(new Agent(gameModel.PlayBoard.Size));
             lbStatusBar.Content = "Сеть обновлена. ";
         }
-        int GetPlayBoardSizeInput()
-        {
-            if (tbPlayBoardSize.Text == "")
-            {
-                lbStatusBar.Content = "Задайте размер поля!";
-                return gameModel.PlayBoard.Size;
-            }
-            return Convert.ToInt32(tbPlayBoardSize.Text);
-        }
         void UpdateTotalRounds()
         {
-            if (tbTotalRounds.Text == "")
+            if (inputViewModel.RoundsAmount == 0)
             {
                 lbStatusBar.Content = "Задайте количество тренировочных игр!";
+                return;
             }
-            else appViewModel.TotalRounds = Convert.ToInt32(tbTotalRounds.Text) * 2;
         }
         void UpdatePlayBoardSize()
         {
-            int boardSize = GetPlayBoardSizeInput();
-            if (gameModel.PlayBoard.Size != boardSize)
+            if (inputViewModel.BoardSize == 0)
             {
-                gameModel.PlayBoard.Size = boardSize;
+                lbStatusBar.Content = "Задайте размер поля!";
+                return;
+            }
+            if (gameModel.PlayBoard.Size != inputViewModel.BoardSize)
+            {
+                gameModel.PlayBoard.Size = inputViewModel.BoardSize;
                 ResetNet();
                 InitializeGrid();
             }
@@ -253,13 +226,12 @@ namespace TicTacToeWPF
             AllowGridClick(true);
             gameModel.PlayBoard = new PlayBoard(gameModel.PlayBoard.Size);
             if (!gameModel.Players.Any(p => p is Person))
-                gameModel.Players[1] = appViewModel.Person;
+                gameModel.Players[1] = new Person();
             gameInteractive = new InteractiveGame()
             {
                 GameModel = gameModel
             };
             gameInteractive.StartGame();
-            lbStatusBar.Content = gameModel.Get<Person>().StatusBarLabel;
             UpdateInteractiveStats();
         }
         void btnStartTrain_Clicked(object sender, RoutedEventArgs args)
@@ -268,7 +240,7 @@ namespace TicTacToeWPF
             UpdatePlayBoardSize();
             UpdateTotalRounds();
             gameModel.Players[0] = gameModel.Get<Agent>();
-            gameModel.Players[1] = appViewModel.TrainOpponent;
+            gameModel.Players[1] = inputViewModel.TrainOpponent;
             game = new Game()
             {
                 GameModel = gameModel
@@ -278,7 +250,6 @@ namespace TicTacToeWPF
         }
         void btnStop_Clicked(object sender, RoutedEventArgs args)
         {
-
             timer.Stop();
             lbStatusBar.Content = "Обучение завершено. ";
 

@@ -40,7 +40,7 @@
                     <TextBox Name="tbPlayBoardSize" 
                          Width="20" 
                          Height="20"
-                         Text="3" 
+                         Text="{Binding Path=BoardSize, Mode=TwoWay}" 
                          FontSize="12" 
                          TextAlignment="Center" 
                          Background="Snow"/>
@@ -64,21 +64,17 @@
                     <ComboBox Name="cbOpponent"
                           Height="23" 
                           FontSize="10" 
-                          SelectedIndex="0"
-                          SelectionChanged="cbOpponent_SelectionChanged" >
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <Label Content="{Binding}" 
-                                   Height="23"
-                                   FontSize="10"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
+                              ItemsSource="{Binding Path=Opponents}"
+                              DisplayMemberPath="Type"
+                              SelectedValuePath="Type"
+                              SelectedValue="{Binding Path=Opponent}"
+                          SelectedIndex="0">
                     </ComboBox>
                     <Label Content="Кол-во игр:"/>
                     <TextBox Name="tbTotalRounds" 
                          Width="auto" 
                          Height="20"
-                         Text="100" 
+                         Text="{Binding Path=RoundsAmount, Mode=TwoWay}" 
                          FontSize="12" 
                          TextAlignment="Center" 
                          Background="Snow"/>
@@ -141,7 +137,7 @@
                        Grid.Row="0" 
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       Text=""  
+                       Text="Статистика обучения сети"  
                        FontSize="18"  />
                 <oxy:Plot Name="pltResultGraph" 
                       Grid.Row="1" 
