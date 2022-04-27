@@ -69,6 +69,116 @@ namespace TicTacToeWPF
             trainStats = new TrainStats();
             InitializeGrid();
         }
+        void btnStartGame_Clicked(object sender, RoutedEventArgs args)
+        {
+            UpdatePlayBoardSize();
+            ClearGridContent();
+            AllowGridClick(true);
+            gameModel.PlayBoard = new PlayBoard(gameModel.PlayBoard.Size);
+            if (!gameModel.Players.Any(p => p is Person))
+                gameModel.Players[1] = new Person();
+            gameInteractive = new InteractiveGame()
+            {
+                GameModel = gameModel
+            };
+            gameInteractive.StartGame();
+            UpdateInteractiveStats();
+        }
+        void btnStartTrain_Clicked(object sender, RoutedEventArgs args)
+        {
+            ClearVisualStats();
+            UpdatePlayBoardSize();
+            gameModel.Players[0] = gameModel.Get<Agent>();
+            gameModel.Players[1] = inputViewModel.TrainOpponent;
+            game = new Game()
+            {
+                GameModel = gameModel
+            };
+            lbStatusBar.Content = "Обучение сети в процессе. ";
+            timer.Start();
+        }
+        void btnStop_Clicked(object sender, RoutedEventArgs args)
+        {
+            timer.Stop();
+            lbStatusBar.Content = "Обучение завершено. ";
+
+        }
+        void btnResetNet_Clicked(object sender, RoutedEventArgs args)
+        {
+            ResetNet();
+        }
+        void timer_Tick(object sender, EventArgs args)
+        {
+            ClearGridContent();
+            gameModel.PlayBoard = new PlayBoard(gameModel.PlayBoard.Size);
+            GameState gameState = game.Play();
+            gameModel.SwitchPlayers();
+            UpdateVisualStats(gameState);
+        }
+        async void btnGrid_Click(object sender, RoutedEventArgs args)
+        {
+            Button btn = sender as Button;
+            if (btn.Content != null && btn.Content.ToString() != "") return;
+
+            (int X, int Y) move = (Grid.GetRow(btn), Grid.GetColumn(btn));
+            btn.Content = gameModel.CurrentTurn;
+            gameModel.PlayBoard.PlaceMove(move, gameModel.CurrentTurn);
+            lbStatusBar.Content = "Ваш ход сделан. Анализ игрового поля...";
+            AllowGridClick(false);
+            await Task.Delay(TimeSpan.FromSeconds(1.5));
+            gameModel.Get<Person>().StatusBarLabel = "Сеть сделала свой выбор. ";
+            gameInteractive.EndMove();
+            UpdateInteractiveStats();
+        }
+        void InitializeGrid()
+        {
+            gridPlayBoard.Children.Clear();
+            gridPlayBoard.ColumnDefinitions.Clear();
+            gridPlayBoard.RowDefinitions.Clear();
+            int size = gameModel.PlayBoard.Size;
+            for (int i = 0; i < size; i++)
+            {
+                gridPlayBoard.RowDefinitions.Add(new RowDefinition());
+                gridPlayBoard.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+            for (int i = 0; i < size; i++)
+                for (int j = 0; j < size; j++)
+                {
+                    Button button = new Button();
+                    Grid.SetRow(button, i);
+                    Grid.SetColumn(button, j);
+                    button.FontSize = 18;
+                    button.IsHitTestVisible = false;
+                    button.Click += btnGrid_Click;
+                    gridPlayBoard.Children.Add(button);
+                }
+        }
+        void AllowGridClick(bool isGame)
+        {
+            foreach (Button btn in gridPlayBoard.Children)
+                btn.IsHitTestVisible = isGame;
+        }
+        void PlaceMoveOnGrid((int X, int Y) move, PlayerTurn playerTurn)
+        {
+            foreach (Button btn in gridPlayBoard.Children)
+                if (Grid.GetRow(btn) == move.X && Grid.GetColumn(btn) == move.Y)
+                    btn.Content = playerTurn;
+            
+        }
+        void ClearGridContent()
+        {
+            foreach (Button btn in gridPlayBoard.Children)
+                btn.Content = "";
+        }
+        void UpdatePlayBoardSize()
+        {
+            if (gameModel.PlayBoard.Size != inputViewModel.BoardSize)
+            {
+                gameModel.PlayBoard.Size = inputViewModel.BoardSize;
+                ResetNet();
+                InitializeGrid();
+            }
+        }
 
         void UpdateVisualStats(GameState gameState)
         {
@@ -99,7 +209,7 @@ namespace TicTacToeWPF
                 lbStatusBar.Content = "Обучение завершено. ";
             }
         }
-        public void ClearVisualStats()
+        void ClearVisualStats()
         {
             tbRoundsCount.Text = "";
             trainStats.Clear();
@@ -107,62 +217,7 @@ namespace TicTacToeWPF
             pltResultGraph.InvalidatePlot();
             lvResultTable.Items.Clear();
         }
-        void InitializeGrid()
-        {
-            gridPlayBoard.Children.Clear();
-            gridPlayBoard.ColumnDefinitions.Clear();
-            gridPlayBoard.RowDefinitions.Clear();
-            int size = gameModel.PlayBoard.Size;
-            for (int i = 0; i < size; i++)
-            {
-                gridPlayBoard.RowDefinitions.Add(new RowDefinition());
-                gridPlayBoard.ColumnDefinitions.Add(new ColumnDefinition());
-            }
-            for (int i = 0; i < size; i++)
-                for (int j = 0; j < size; j++)
-                {
-                    Button button = new Button();
-                    Grid.SetRow(button, i);
-                    Grid.SetColumn(button, j);
-                    button.FontSize = 18;
-                    button.IsHitTestVisible = false;
-                    button.Click += btnGrid_Click;
-                    gridPlayBoard.Children.Add(button);
-                }
-        }
-        void AllowGridClick(bool isGame)
-        {
-            foreach (Button btn in gridMain.Children.OfType<Button>())
-                btn.IsHitTestVisible = !isGame;
-            foreach (Button btn in gridPlayBoard.Children)
-                btn.IsHitTestVisible = isGame;
-        }
-        void ClearGridContent()
-        {
-            foreach (Button btn in gridPlayBoard.Children)
-                btn.Content = "";
-        }
-        async void btnGrid_Click(object sender, RoutedEventArgs args)
-        {
-            Button btn = sender as Button;
-            if (btn.Content != null && btn.Content.ToString() != "") return;
-
-            (int X, int Y) move = (Grid.GetRow(btn), Grid.GetColumn(btn));
-            btn.Content = gameModel.CurrentTurn;
-            gameModel.PlayBoard.PlaceMove(move, gameModel.CurrentTurn);
-            lbStatusBar.Content = "Ваш ход сделан. Анализ игрового поля...";
-            await Task.Delay(TimeSpan.FromSeconds(1.5));
-            gameModel.Get<Person>().StatusBarLabel = "Сеть сделала свой выбор. ";
-            gameInteractive.EndMove();
-            UpdateInteractiveStats();
-        }
-        void PlaceMoveOnGrid((int X, int Y) move, PlayerTurn playerTurn)
-        {
-            foreach (Button btn in gridPlayBoard.Children)
-                if (Grid.GetRow(btn) == move.X && Grid.GetColumn(btn) == move.Y)
-                    btn.Content = playerTurn;
-            
-        }
+        
         void UpdateInteractiveStats()
         {
             List<(int X, int Y)> playedMoves = gameModel.PlayBoard.PlayedMoves;
@@ -171,88 +226,22 @@ namespace TicTacToeWPF
             {
                 if (gameModel.GetCurrentPlayer() is Agent)
                     PlaceMoveOnGrid(playedMoves.Last(), (PlayerTurn)playedValues.Last());
-                AllowGridClick(false);
+                
                 gameModel.SwitchPlayers();
             }
             else if (gameModel.PlayBoard.PlayedMoves.Count > 0)
             {
+
                 PlaceMoveOnGrid(playedMoves.Last(), (PlayerTurn)playedValues.Last());
+                AllowGridClick(true);
             }
             lbStatusBar.Content = gameModel.Get<Person>().StatusBarLabel;
-        }
-        void timer_Tick(object sender, EventArgs args)
-        {
-            ClearGridContent();
-            gameModel.PlayBoard = new PlayBoard(gameModel.PlayBoard.Size);
-            GameState gameState = game.Play();
-            gameModel.SwitchPlayers();
-            UpdateVisualStats(gameState);
-        }
-        void btnResetNet_Clicked(object sender, RoutedEventArgs args)
-        {
-            ResetNet();
         }
         void ResetNet()
         {
             gameModel.Set<Agent>(new Agent(gameModel.PlayBoard.Size));
             lbStatusBar.Content = "Сеть обновлена. ";
         }
-        void UpdateTotalRounds()
-        {
-            if (inputViewModel.RoundsAmount == 0)
-            {
-                lbStatusBar.Content = "Задайте количество тренировочных игр!";
-                return;
-            }
-        }
-        void UpdatePlayBoardSize()
-        {
-            if (inputViewModel.BoardSize == 0)
-            {
-                lbStatusBar.Content = "Задайте размер поля!";
-                return;
-            }
-            if (gameModel.PlayBoard.Size != inputViewModel.BoardSize)
-            {
-                gameModel.PlayBoard.Size = inputViewModel.BoardSize;
-                ResetNet();
-                InitializeGrid();
-            }
-        }
-        void btnStartGame_Clicked(object sender, RoutedEventArgs args)
-        {
-            UpdatePlayBoardSize();
-            ClearGridContent();
-            AllowGridClick(true);
-            gameModel.PlayBoard = new PlayBoard(gameModel.PlayBoard.Size);
-            if (!gameModel.Players.Any(p => p is Person))
-                gameModel.Players[1] = new Person();
-            gameInteractive = new InteractiveGame()
-            {
-                GameModel = gameModel
-            };
-            gameInteractive.StartGame();
-            UpdateInteractiveStats();
-        }
-        void btnStartTrain_Clicked(object sender, RoutedEventArgs args)
-        {
-            ClearVisualStats();
-            UpdatePlayBoardSize();
-            UpdateTotalRounds();
-            gameModel.Players[0] = gameModel.Get<Agent>();
-            gameModel.Players[1] = inputViewModel.TrainOpponent;
-            game = new Game()
-            {
-                GameModel = gameModel
-            };
-            lbStatusBar.Content = "Обучение сети в процессе. ";
-            timer.Start();
-        }
-        void btnStop_Clicked(object sender, RoutedEventArgs args)
-        {
-            timer.Stop();
-            lbStatusBar.Content = "Обучение завершено. ";
-
-        }
+        
     }
 }

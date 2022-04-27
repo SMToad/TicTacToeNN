@@ -42,7 +42,7 @@ namespace TicTacToeWPF.Models
             set
             {
                 if (_boardSize == value) return;
-                _boardSize = value;
+                _boardSize = Math.Max(3, Math.Min(value, 5)); ;
                 OnPropertyChanged("BoardSize");
             }
         }
@@ -81,7 +81,7 @@ namespace TicTacToeWPF.Models
             set
             {
                 if (_roundsAmount == value) return;
-                _roundsAmount = value;
+                _roundsAmount = Math.Max(5, Math.Min(value, 50000));
                 OnPropertyChanged("RoundsAmount");
             }
         }
@@ -92,8 +92,5 @@ namespace TicTacToeWPF.Models
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
         public event PropertyChangedEventHandler PropertyChanged;
-        //public Player TrainOpponent { get; private set; }
-        //public int TrainRounds { get; set; }
-        //public int TotalRounds { get; set; }
     }
 }

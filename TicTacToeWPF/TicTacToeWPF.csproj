@@ -68,7 +68,6 @@
     <Compile Include="GameElements\PlayerTurn.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\MemoryBuffer.cs" />
-    <Compile Include="Garbage\MinMaxPlayer.cs" />
     <Compile Include="Helpers\MemoryEntry.cs" />
     <Compile Include="Models\InputViewModel.cs" />
     <Compile Include="Models\GameModel.cs" />
@@ -101,7 +100,6 @@
   <ItemGroup>
     <Compile Include="NeuralNetwork\Architecture\Network.cs" />
     <Compile Include="NeuralNetwork\Architecture\Neuron.cs" />
-    <Compile Include="Garbage\PerfectPlayer.cs" />
     <Compile Include="Players\Player.cs" />
     <Compile Include="GameElements\Game.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
