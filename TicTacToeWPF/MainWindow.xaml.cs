@@ -94,7 +94,7 @@ namespace TicTacToeWPF
             {
                 GameModel = gameModel
             };
-            lbStatusBar.Content = "Обучение сети в процессе. ";
+            lbStatusBar.Content = "Обучение сети в процессе... ";
             timer.Start();
         }
         void btnStop_Clicked(object sender, RoutedEventArgs args)

@@ -85,7 +85,7 @@ namespace TicTacToeWPF.Models
                 OnPropertyChanged("RoundsAmount");
             }
         }
-        public int TrainStep { get => Math.Max(RoundsAmount, 1); }
+        public int TrainStep { get => Math.Max(RoundsAmount/10, 1); }
         private void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
