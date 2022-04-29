@@ -34,5 +34,5 @@ This is a WPF application themed around a neural network that can play tic-tac-t
 - Add the option to see the networks weights
 - Add the ability to select the amount of cells needed for the win as well as the playboard size, e.g. 3 cells in a row on a 5x5 playboard
 - Make the user interface more aesthetically pleasing
-## Acknowledgments
+## Acknowledgements
 This project was completed as a coursework on machine learning named "Tic-Tac-Toe Neural Network" ("Нейронная сеть для игры в Крестики-Нолики"). The classes for the neural network and back propagation were based on the ![AForge.NET framework](http://www.aforgenet.com/) classes.
