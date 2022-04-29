@@ -9,28 +9,21 @@ This is a WPF application themed around a neural network that can play tic-tac-t
 ## Screenshots
 **Start page view**
 
-![start page](./images/main.png)
+<img src="./images/main.png" width="600">
 
-**In-game page view**
+**Game mode**
 
-![in-game page](./images/game_in.png)
+![in-game page](./images/game_in.gif)
 
-**End-game page view**
+**Training mode**
 
-![end-game page](./images/game_end.png)
-
-**In-training view**
-
-![in-training page](./images/training_in.png)
-
-**Finished training view**
-
-![end-training page](./images/training_end.png)
+![in-training page](./images/training_in.gif)
 
 **Different playboard sizes**
 
-![playboard size 4](./images/game_size_4.png)
-![playboard size 5](./images/game_size_5.png)
+<img src="./images/game_size_4.png" width="600">
+<img src="./images/game_size_5.png" width="600">
+
 ## Technologies used
 - .NET Framework 4.7.2
 - C# 7.3
