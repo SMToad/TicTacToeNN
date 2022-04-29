@@ -1,5 +1,5 @@
 # TicTacToeNN
-This is a WPF application themed around a neural network that can play tic-tac-toe. The app provides two main functionalities: training the neural network and playing against it yourself. The used neural network is a ![Feedforward neural network](https://en.wikipedia.org/wiki/Feedforward_neural_network) that utilizes ![Q-Learning](https://towardsdatascience.com/qrash-course-deep-q-networks-from-the-ground-up-1bbda41d3677) in its training process.
+This is a WPF application themed around a neural network that can play tic-tac-toe. The app provides two main functionalities: training the neural network and playing against it yourself. The used neural network is a <a href="https://en.wikipedia.org/wiki/Feedforward_neural_network">Feedforward neural network</a> that utilizes <a href="https://towardsdatascience.com/qrash-course-deep-q-networks-from-the-ground-up-1bbda41d3677">Q-Learning</a> in its training process.
 ## Features
 - Interactive gameplay of tic-tac-toe
 - Modifying the playboard size (available size range is [3,5])
@@ -35,4 +35,4 @@ This is a WPF application themed around a neural network that can play tic-tac-t
 - Add the ability to select the amount of cells needed for the win as well as the playboard size, e.g. 3 cells in a row on a 5x5 playboard
 - Make the user interface more aesthetically pleasing
 ## Acknowledgements
-This project was completed as a coursework on machine learning named "Tic-Tac-Toe Neural Network" ("Нейронная сеть для игры в Крестики-Нолики"). The classes for the neural network and back propagation were based on the ![AForge.NET framework](http://www.aforgenet.com/) classes.
+This project was completed as a coursework on machine learning named "Tic-Tac-Toe Neural Network" ("Нейронная сеть для игры в Крестики-Нолики"). The classes for the neural network and back propagation were based on the <a href="http://www.aforgenet.com/">AForge.NET framework</a> classes.
